@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Untitled Document</title>
+    <meta name="Author" content="" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            padding: 0px;
+            margin: 0px;
+        }
+
+        header {
+            float: left;
+            height: 100px;
+            background-color: cadetblue;
+            color: white;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        body {
+            background-color: lightgray;
+        }
+
+        #content {
+            margin-left: auto;
+            margin-right: auto;
+            width: 80%;
+            height: 500px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .visual {
+            background-color: blue;
+            margin-left: 3px;
+        }
+
+        input[type="button"] {
+            border-radius: 20px;
+            height: 50px;
+            width: 50px;
+            background-color: transparent;
+            border: 3px white solid;
+            transition: 0.3s ease-in-out;
+            color: white;
+        }
+
+        input[type="button"]:hover {
+            background-color: white;
+            color: black;
+        }
+
+    </style>
+</head>
+
+<body onload="init()">
+    <header>
+
+        <label for="nbcase">Number of elements in array : </label>
+        <input type="number" id="nbcase" min="10" max="100" value="10" onchange="changeNb()">
+
+        <select name="algo" id="algo">
+            <option value="bubble">Bubble Sort</option>
+            <option value="insertion">Insertion Sort</option>
+            <option value="merge">Merge Sort</option>
+            <option value="quick">Quick Sort</option>
+        </select>
+
+        <input type="button" onclick="generate()" value="New" id="generateButton">
+
+        <input type="button" onclick="sort()" value="Sort" id="sortButton">
+
+    </header>
+    <div id="content">
+    </div>
+    <script>
+        var content = document.getElementById('content');
+        var nb = document.getElementById('nbcase').value;
+        var tab = Array();
+        var vizualTab = Array();
+        var index = 0;
+        var animation;
+        var generateButton = document.getElementById('generateButton');
+        var sortButton = document.getElementById('sortButton');
+
+        function generate() {
+            tab.length = 0;
+            for (var i = 0; i < nb; i++) {
+                tab.push(Math.floor(Math.random() * 100));
+            }
+            visualize(tab);
+        }
+
+        function init() {
+            generate();
+        }
+
+        function swap(i, j) {
+            temp = tab[i];
+            tab[i] = tab[j];
+            tab[j] = temp;
+        }
+
+        function bubleSort() {
+            for (i = 0; i < tab.length; i++) {
+                for (j = 0; j < tab.length - i - 1; j++) {
+                    if (tab[j] > tab[j + 1]) {
+                        swap(j, j + 1);
+                        vizualTab.push(tab.slice());
+                    }
+                }
+            }
+        }
+
+        function insertionSort() {
+            for (i = 1; i < tab.length; i++) {
+                key = tab[i];
+                j = i - 1;
+                while (j >= 0 && tab[j] > key) {
+                    tab[j + 1] = tab[j]
+                    j -= 1;
+                    vizualTab.push(tab.slice());
+                }
+                tab[j + 1] = key;
+            }
+        }
+
+        function quickSort(left, right) {
+
+            var index;
+
+            if (tab.length > 1) {
+
+                index = partition(left, right);
+
+                if (left < index - 1) {
+                    quickSort(left, index - 1);
+                }
+
+                if (index < right) {
+                    quickSort(index, right);
+                }
+
+            }
+        }
+
+        function partition(left, right) {
+
+            var pivot = tab[Math.floor((right + left) / 2)],
+                i = left,
+                j = right;
+
+
+            while (i <= j) {
+
+                while (tab[i] < pivot) {
+                    i++;
+                }
+
+                while (tab[j] > pivot) {
+                    j--;
+                }
+
+                if (i <= j) {
+                    swap(i, j);
+                    vizualTab.push(tab.slice());
+                    i++;
+                    j--;
+                }
+            }
+
+            return i;
+        }
+
+
+        function animator() {
+            sortButton.disabled = true;
+            generateButton.disabled = true;
+            animation = setInterval(function() {
+                visualize(vizualTab[index]);
+                upIndex();
+            }, 1000 / tab.length);
+        }
+
+        function sort() {
+            var algo = document.getElementById('algo').value;
+            switch (algo) {
+                case "bubble":
+                    bubleSort();
+                    animator();
+                    break;
+                case "insertion":
+                    insertionSort();
+                    animator();
+                    break;
+                case "quick":
+                    quickSort(0,tab.length-1);
+                    animator();
+                    break;
+                default:
+                    console.log("Erreur d'algo");
+            }
+        }
+
+        function upIndex() {
+            if (index == vizualTab.length - 1) {
+                clearInterval(animation);
+                index = 0;
+                vizualTab.length = 0;
+                sortButton.disabled = false;
+                generateButton.disabled = false;
+            } else {
+                index += 1;
+            }
+        }
+
+        function changeNb() {
+            nb = document.getElementById('nbcase').value;
+        }
+
+        function visualize(list) {
+            content.innerHTML = "";
+            var width = (content.clientWidth - (nb - 1) * 3) / nb;
+            list.forEach(function(element) {
+                content.innerHTML += '<div class="visual" style="height:' + element * 3 + 'px;width:' + width + 'px;background-color:blue;"></div>';
+            });
+        }
+
+    </script>
+</body>
+
+</html>
